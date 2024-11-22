@@ -1,0 +1,5 @@
+import random
+random_num = random.randint(0, 100)
+num_guess = 0
+while random_num != num_guess and num_guess < 5:
+    
