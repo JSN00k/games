@@ -1,5 +1,20 @@
 import random
-random_num = random.randint(0, 100)
-num_guess = 0
-while random_num != num_guess and num_guess < 5:
-    
+# Pick a random number
+number = random.randint(1,100)
+
+# Ask user for a guess
+guess = int(input("guess the number? It's between 1 and 100. "))
+counter = 0
+while counter < 10 :
+  if guess > 100 or guess < 1:
+    guess = int(input("Out of range. Try again. "))
+  elif number > guess:
+    guess = int(input("That was too low. Try again. "))
+  elif number < guess:
+    guess = int(input("That was too high. Try again. "))
+  else :
+    print(number, "was the right answer. Well Done!")
+    break
+  counter += 1
+if counter == 10 :
+  print("You ran out of guesses. Sorry! ")
