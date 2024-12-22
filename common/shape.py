@@ -46,10 +46,12 @@ class Shape():
 
         else:
             # use modular arithmetic to work out the new locations, however, if a location
-            # was already off screen do not do the modular arigthmetic 
-            newLocations = [create_coordinate(x, ((((x[accessor] + move_val) % end_val) + end_val)) % self.grid.columns, moveHoriz) for x in self.shape_coords if x[accessor] >= 0 and x[accessor] < end_val]
-            # The previous loop does not increment the values that were off the sceen.
-            newLocations = [create_coordinate(x, x[accessor] + move_val, moveHoriz) for x in newLocations if x[accessor] < 0 or x[accessor] >= end_val]
+            # was already off screen do not do the modular arigthmetic
+            if all(map(lambda x : self.grid.location_is_in_grid(x), self.shape_coords)):
+                newLocations = [create_coordinate(x, ((((x[accessor] + move_val) % end_val) + end_val)) % end_val, moveHoriz) for x in self.shape_coords if x[accessor] >= 0 and x[accessor] < end_val - 1]
+            else:
+                # Don't start wrapping until all parts of the shape are on screen
+                newLocations = [create_coordinate(x, x[accessor] + move_val, moveHoriz) for x in newLocations if x[accessor] < 0 or x[accessor] >= end_val]
 
         self.grid.clear_locations(self.shape_coords)
         # we have now constructed the new locations.

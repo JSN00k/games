@@ -19,7 +19,7 @@ SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 SCREEN.fill(BLUE)
 
 my_grid = Grid(SCREEN, 5, 10, 20, BLACK, WHITE)
-my_shape = Shape([Coordinate(0, 0), Coordinate(0, 1), Coordinate(1, 1)], my_grid, False, True, (0, 0, 200))
+my_shape = Shape([Coordinate(0, 0), Coordinate(0, 1), Coordinate(1, 1)], my_grid, True, True, (0, 0, 200))
 
 running = True
 
