@@ -7,6 +7,18 @@ from shape import Shape
 from shape import Direction
 import pygame
 
+def direction_for_key(pygame_key):
+    if pygame_key == pygame.K_w:
+        return Direction.UP
+    if pygame_key == pygame.K_s:
+        return Direction.DOWN
+    if pygame_key == pygame.K_a:
+        return Direction.LEFT
+    if pygame_key == pygame.K_d:
+        return Direction.RIGHT
+    
+    return None
+
 BLACK = (0, 0, 0)
 WHITE = (200, 200, 200)
 BLUE = (0, 0, 200)
@@ -19,39 +31,46 @@ SCREEN = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 SCREEN.fill(BLUE)
 
 my_grid = Grid(SCREEN, 5, 10, 20, BLACK, WHITE)
-my_shape = Shape([Coordinate(0, 0), Coordinate(0, 1), Coordinate(1, 1)], my_grid, True, True, (0, 0, 200))
+my_shape = Shape([Coordinate(0, 0), Coordinate(0, 1), Coordinate(1, 1)], my_grid, False, True, (0, 0, 200))
 
 running = True
 
 my_grid.clear()
+my_grid.set_colour_at_location(Coordinate(3, 4), (200, 0, 0))
 my_shape.add_shape_to_grid()
 my_grid.draw()
 pygame.display.flip() #update the display
 
+persistent_key = None
+
 while running:
-    
+    directionReceived = False
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN and not persistent_key:
+            direction = direction_for_key(event.key)
+            if direction:
+                persistent_key = event.key
+                if not directionReceived:
+                    my_shape.move(direction)
+                    directionReceived = True
+        elif persistent_key and event.type == pygame.KEYUP and persistent_key == event.key:
+            persistent_key = None
 
-    # Get all currently pressed keys
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        my_shape.move(Direction.UP)
-    if keys[pygame.K_DOWN]:
-        my_shape.move(Direction.DOWN)
-    if keys[pygame.K_LEFT]:
-        my_shape.move(Direction.LEFT)
-    if keys[pygame.K_RIGHT]:
-        my_shape.move(Direction.RIGHT)
+    if persistent_key and not directionReceived:
+        my_shape.move(direction_for_key(persistent_key))
 
-    my_grid.clear()
     my_shape.add_shape_to_grid()
 
     my_grid.draw()
     pygame.display.flip() #update the display
 
-    pygame.time.Clock().tick(60)
+    pygame.time.Clock().tick(5)
+
+
 
 pygame.quit()
 sys.exit()
+

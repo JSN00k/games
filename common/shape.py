@@ -24,34 +24,36 @@ class Shape():
         self.colour = colour
         self.grid = grid
 
+    def all_coords_on_grid(self):
+        return all(map(lambda x : x.x >= 0 and x.x < self.grid.columns and x.y >= 0 and x.y < self.grid.rows, self.shape_coords))
+
     def move_by(self, move_val, moveHoriz):
         newLocations = None
         accessor = 0 # choose the horizontal component
         end_val = self.grid.columns
+
+        # Don't allow wrapping until all parts of the shape are already on the grid.
+        actually_allow_wrap = self.allow_wrap and self.all_coords_on_grid()
         
         if not moveHoriz:
             # set up for moving vertically
             accessor = 1
             end_val = self.grid.rows
             
-        if not self.allow_wrap:
+        if not actually_allow_wrap:
             # check we can move, return false if we can't
             newLocations = [create_coordinate(x, x[accessor] + move_val, moveHoriz) for x in self.shape_coords]
-            # The rule is that shapes cannot go off the grid, however if they
-            # were off the grid they can move onto it.
+            # The rule is that shapes cannot go off the grid or further off the grid
+            # so if a coord in the shape is at the edge of this axis or further and moving toward the edge the
+            # move is not allowed.
             true_false_list = map(lambda x : x[accessor] >= end_val - 1 and move_val > 0 or x[accessor] <= 0 and move_val < 0, self.shape_coords)
             if any(true_false_list):
                 # one of my coordinates is off the grid and moving away from the grid
                 return False
 
         else:
-            # use modular arithmetic to work out the new locations, however, if a location
-            # was already off screen do not do the modular arigthmetic
-            if all(map(lambda x : self.grid.location_is_in_grid(x), self.shape_coords)):
-                newLocations = [create_coordinate(x, ((((x[accessor] + move_val) % end_val) + end_val)) % end_val, moveHoriz) for x in self.shape_coords if x[accessor] >= 0 and x[accessor] < end_val - 1]
-            else:
-                # Don't start wrapping until all parts of the shape are on screen
-                newLocations = [create_coordinate(x, x[accessor] + move_val, moveHoriz) for x in newLocations if x[accessor] < 0 or x[accessor] >= end_val]
+            # We can't get here unless all locations were already on the grid
+                newLocations = [create_coordinate(x, ((((x[accessor] + move_val) % end_val) + end_val)) % end_val, moveHoriz) for x in self.shape_coords]
 
         self.grid.clear_locations(self.shape_coords)
         # we have now constructed the new locations.
