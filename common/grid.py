@@ -66,7 +66,8 @@ class Grid:
 
     def clear_locations(self, locations):
         for location in locations:
-            self.blockColourArray[location.y][location.x] = self.background
+            if self.location_is_in_grid(location):
+                self.blockColourArray[location.y][location.x] = self.background
 
     def clear(self):
         self.blockColourArray = [[self.background for x in range(self.columns)] for y in range(self.rows)]
